@@ -24,10 +24,10 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: apicast-policy:basicauth
+        name: 'apicast-policy:latest'
     source:
       git:
-        uri: https://github.com/samu91gn/apicast-example-policy.git
+        uri: https://github.com/samugi/apicast-example-policy.git
         ref: 'master'
       type: Git
     strategy:
@@ -35,7 +35,8 @@ objects:
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          name: 'amp-apicast:${AMP_RELEASE}'
+          namespace: apicast
+          name: 'apicast-gateway-rhel8:3scale2.9'
 
 - apiVersion: v1
   kind: BuildConfig
@@ -62,7 +63,7 @@ objects:
       images:
         - from:
             kind: ImageStreamTag
-            name: 'apicast-policy:basicauth'
+            name: 'apicast-policy:latest'
           paths:
             # copy policy source code into the new image
             - destinationDir: policies
@@ -74,12 +75,12 @@ objects:
       dockerfile: |
         FROM scratch
         COPY . src
-
     strategy:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: 'amp-apicast:${AMP_RELEASE}'
+          namespace: apicast
+          name: 'apicast-gateway-rhel8:3scale2.9'
       type: Docker
     triggers:
       - type: ConfigChange
