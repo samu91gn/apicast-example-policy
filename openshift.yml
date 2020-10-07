@@ -35,8 +35,8 @@ objects:
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          namespace: apicast
-          name: 'apicast-gateway-rhel8:3scale2.9'
+          namespace: ${INPUT_NAMESPACE}
+          name: '${INPUT_IMAGE}'
 
 - apiVersion: v1
   kind: BuildConfig
@@ -50,19 +50,21 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: 'amp-apicast:latest'
+        namespace: ${OUTPUT_NAMESPACE}
+        name: '${OUTPUT_IMAGE}'
     postCommit:
       args:
         - '--test'
         - '--lazy'
       command:
-        - bin/apicast
+        -  bin/apicast
     resources: {}
     runPolicy: Serial
     source:
       images:
         - from:
             kind: ImageStreamTag
+            namespace: ${OUTPUT_NAMESPACE}
             name: 'apicast-policy:latest'
           paths:
             # copy policy source code into the new image
@@ -75,18 +77,28 @@ objects:
       dockerfile: |
         FROM scratch
         COPY . src
+        USER root
+
     strategy:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          namespace: apicast
-          name: 'apicast-gateway-rhel8:3scale2.9'
+          namespace: ${INPUT_NAMESPACE}
+          name: '${INPUT_IMAGE}'
       type: Docker
     triggers:
       - type: ConfigChange
-      - type: ImageChange
 
 parameters:
-- name: AMP_RELEASE
+- name: INPUT_NAMESPACE
   required: true
-  description: AMP Version (eg. 2.2.0-GA)
+  description: Input Namespace (OpenShift Project name) from which the base image is loaded
+- name: OUTPUT_NAMESPACE
+  required: true
+  description: Output Namespace (OpenShift Project name)
+- name: INPUT_IMAGE
+  required: true
+  description: Input image name
+- name: OUTPUT_IMAGE
+  required: true
+  description: Output image name
