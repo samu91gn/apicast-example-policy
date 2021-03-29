@@ -1,0 +1,11 @@
+{
+  "$schema": "http://apicast.io/policy-v1/schema#manifest#",
+  "name": "Close Upstream Connections Policy",
+  "summary": "Close all the connections to upstream",
+  "description": "Policy to force close all upstream connections by setting the Connection header to the hardcoded value: close",
+  "version": "0.1",
+  "configuration": {
+    "type": "object",
+    "properties": { }
+  }
+}
